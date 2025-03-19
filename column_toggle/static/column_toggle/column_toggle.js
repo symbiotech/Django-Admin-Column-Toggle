@@ -33,10 +33,10 @@ document.addEventListener("DOMContentLoaded", function () {
       checkbox.id = `column-toggle-${column.index}`;
       checkbox.checked =
         shouldShowAllColumns || defaultSelectedColumns.includes(column.field);
-      toggleColumn(column, checkbox.checked);
+      toggleColumn(column, checkbox.checked, storageKey);
 
       checkbox.addEventListener("change", () => {
-        toggleColumn(column, checkbox.checked);
+        toggleColumn(column, checkbox.checked, storageKey);
       });
       const label = document.createElement("label");
       label.htmlFor = `column-toggle-${column.index}`;
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function toggleColumn(column, isVisible) {
+  function toggleColumn(column, isVisible, storageKey) {
     const table = document.querySelector(".results");
     if (!table) return;
 
