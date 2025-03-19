@@ -1,9 +1,11 @@
-from django.test import SimpleTestCase, RequestFactory
+from unittest.mock import MagicMock, patch
+
+from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.db import models
-from django.contrib import admin
-from unittest.mock import patch, MagicMock
+from django.test import RequestFactory, SimpleTestCase
+
 from column_toggle.admin import ColumnToggleModelAdmin
 
 
@@ -16,12 +18,12 @@ class ExampleModel(models.Model):
         return self.name
 
     class Meta:
-        app_label = 'tests'
+        app_label = "tests"
 
 
 class ExampleModelAdmin(ColumnToggleModelAdmin):
-    list_display = ('name', 'description', 'created_at')
-    default_selected_columns = ['name', 'description']
+    list_display = ("name", "description", "created_at")
+    default_selected_columns = ["name", "description"]
 
 
 class MockRequest:
@@ -44,20 +46,22 @@ class ColumnToggleModelAdminTest(SimpleTestCase):
         if not admin.site.is_registered(ExampleModel):
             admin.site.register(ExampleModel, ExampleModelAdmin)
 
-    @patch('column_toggle.admin.ColumnToggleModelAdmin.get_column_toggle_html')
+    @patch("column_toggle.admin.ColumnToggleModelAdmin.get_column_toggle_html")
     def test_get_column_toggle_html(self, mock_get_column_toggle_html):
-        mock_get_column_toggle_html.return_value = '<div class="column-toggle-container"></div>'
+        mock_get_column_toggle_html.return_value = (
+            '<div class="column-toggle-container"></div>'
+        )
         html = self.model_admin.get_column_toggle_html(self.request)
-        self.assertIn('column-toggle-container', html)
+        self.assertIn("column-toggle-container", html)
 
-    @patch('django.contrib.admin.views.main.ChangeList')
+    @patch("django.contrib.admin.views.main.ChangeList")
     def test_changelist_view(self, mock_changelist):
         mock_changelist_instance = MagicMock()
         mock_changelist.return_value = mock_changelist_instance
         mock_changelist_instance.get_results.return_value = None
 
-        request = self.factory.get('/admin/tests/examplemodel/')
+        request = self.factory.get("/admin/tests/examplemodel/")
         request.user = self.user
         response = self.model_admin.changelist_view(request)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('column_toggle_html', response.context_data)
+        self.assertIn("column_toggle_html", response.context_data)
