@@ -97,7 +97,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     localStorage.setItem(storageKey, JSON.stringify(storedSelectedColumns));
   }
-
-  // Call createColumnToggle with default parameters for testing
-  createColumnToggle([], 'column-toggle-storage');
 });
